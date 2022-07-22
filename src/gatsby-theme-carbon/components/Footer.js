@@ -10,11 +10,11 @@ const Content = () => (
           <br /> an issue on{' '}
           <a
               style={{ textDecoration: 'underline' }}
-              href="https://github.ibm.com/ibmdemos-cloudpaks/cloudpak-template/issues/new">
+              href="https://github.ibm.com/ibm-integration/tech-academy-japan/issues/new">
               GitHub.
           </a>
       </p>
-      <p>      
+      <p>
           Built with{' '}
           <a href="https://github.com/carbon-design-system/gatsby-theme-carbon">
             Gatsby Theme Carbon

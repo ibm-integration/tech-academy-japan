@@ -1,33 +1,20 @@
-- title: Early Sales Demo Assets
+- title: Overview & Agenda
   pages:
-    - title: Early Sales Demo Assets
-      path: /esd/overview
-- title: Requesting your Environment
+    - title: Overview & Agenda
+      path: /overview/
+- title: 1 - CP4I Architecture
   pages:
-    - title: Overview
-      path: /environment/overview/
-    - title: Requesting ROKS Cluster
-      path: /environment/requesting/
-    - title: Installing Cloud Pak for MCM
-      path: /environment/installpak/
-- title: Be Ready to Demo
+    - title: 1 - CP4I Architecture Session
+      path: /architecture/
+- title: 2 - EDA Session
   pages:
-    - title: Be Ready to Demo
-      path: /readings/
-- title: Learning with Labs
+    - title: 2 - EDA Session
+      path: /eda/
+- title: 3 - GitOps Automation Session
   pages:
-    - title: Overview
-      path: /labs/overview/
-    - title: Prereq - Install CLI Tools
-      path: /labs/installcli/
-    - title: Introduction
-      path: /labs/introduction/
-    - title: Lab 1 - Multicluster Management
-      path: /labs/clustermgmt/
-- title: Delivering a Workshop
+    - title: 3 - GitOps Automation Session
+      path: /gitops/
+- title: Team Environments
   pages:
-    - title: Delivering a Workshop
-      path: /workshop/overview
-- title: Resources
-  pages:
-    - path: /resources/
+    - title: Team Environments
+      path: /environments/

@@ -1,7 +1,7 @@
 module.exports = {
   siteMetadata: {
-    title: 'Cloud Pak for Template',
-    description: 'Cookbook for Cloud Pak for Pak_Name',
+    title: 'SKO Tech Academy - Integration',
+    description: 'Landing Page for SKO Tech Academy - Integration',
     keywords: 'ibm,mcm,carbon',
   },
   plugins: ['gatsby-theme-carbon',
@@ -19,11 +19,11 @@ module.exports = {
     isSearchEnabled: true,
     repository: {
       baseUrl:
-        'https://github.ibm.com/ibmdemos-cloudpaks/cloudpak-template',
+        'https://github.ibm.com/ibm-integration/tech-academy-japan',
       subDirectory: '/',
     },
   },
 }
 ],
-pathPrefix: "/ibmdemos-cloudpaks/cloudpak-template",
+pathPrefix: "/tech-academy-japan",
 };

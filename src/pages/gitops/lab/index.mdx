@@ -1,0 +1,563 @@
+---
+title: Agile Integration Best Practices Using an IBM GitOps Automation Framework
+---
+
+
+<FeatureCard
+  title="Agile Integration Best Practices Using an IBM GitOps Automation Framework"
+  color="dark"
+  >
+
+![banner](images/automation.jpg)
+
+</FeatureCard>
+
+<AnchorLinks>
+  <AnchorLink>Lab Overview</AnchorLink>
+  <AnchorLink>Prerequisites</AnchorLink>
+  <AnchorLink>Business Context</AnchorLink>
+  <AnchorLink>Automation Framework Introduction</AnchorLink>
+  <AnchorLink>Lab Environment</AnchorLink>
+  <AnchorLink>0 - Preparation</AnchorLink>
+  <AnchorLink>1 - Clone Repositories</AnchorLink>
+  <AnchorLink>2 - Explore the Environment</AnchorLink>
+  <AnchorLink>3 - Prepare the Subscription</AnchorLink>
+  <AnchorLink>4 - Deploy ACE and ES instances</AnchorLink>
+  <AnchorLink>5 - Activate MQ Queue Manager</AnchorLink>
+  <AnchorLink>6 - Customize Event Streams</AnchorLink>
+  <AnchorLink>7 - Configure ACE</AnchorLink>
+  <AnchorLink>8 - Customize APIC</AnchorLink>
+  <AnchorLink>9 - Check the Demo Assets</AnchorLink>
+  <AnchorLink>Summary</AnchorLink>
+</AnchorLinks>
+
+***
+
+## Lab Overview
+
+Have you received requests to deliver a Multi-style Integration demo or PoC, and you don’t know how to quickly prepare this environment? You are on the right place. In this session,  you will learn how to prepare a demo/PoC environment using GitOps automation framework. This environment will include different assets, capabilities, services and applications of IBM Cloud Pak for Integration.
+
+The first main goal of this session is to provide you a complete CP4I environment with multiple demo assets to be ready to progress your sales opportunity. This first goal is achieved by reusing a <a href="https://github.ibm.com/joel-gomez/cp4i-demo" target="_blank">multi-style integration demo assets</a>.
+
+The second goal is to provide this environment quickly and easily, by using the GitOps automation framework, more details <a href="https://production-gitops.dev/" target="_blank">here</a> about Cloud Pak Production Deployment Guides.
+
+This document was created for Senior Technical Specialists, and we know you are one of them. Because of that, instead to have very detailled steps, we have high level directions about what you need to do. There are some challenges that we don't explain how to do them, but we are pretty sure that you can do it! But let the proctors know if you have any issue to complete the challenges.
+
+As part of the evalution process of this session, at the end, you will need to capture and upload screenshots of your final progress. In this document, you will see some references about the necessary screenshots.
+
+In this session you will learn:
+  - the IBM opinionated point of view regarding a GitOps centric method to manage RHOCP infrastructure, IBM integration software and application workload code (three tier GitOps architecture).
+  - how to develop, review, and extend an IBM GitOps automation repository that incapsulate key software components within the IBM Integration portfolio.
+  - how to position a GitOps automation framework as a key boot-strapping and operational mechanism supporting a Client PoC activity and Client adoption.
+
+***
+
+## Prerequisites
+
+- You need to have an OpenShift environment with GitOps operators. For this session, your proctor will provide you a pre-installed environment, with admin access (more details below). If you want to create your personal environment, check this <a href="https://www.youtube.com/watch?v=SmDE80vuP3w" target="_blank">video</a> or follow the preparation section from this <a href="https://github.com/sko-master/multi-tenancy-gitops/blob/master/doc/sko-scenario.md" target="_blank">documentation</a>.
+- You need to have installed in your machine:
+  - <a href="https://docs.openshift.com/container-platform/4.8/cli_reference/openshift_cli/getting-started-cli.html" target="_blank">oc CLI</a> v4.6+.
+  - github CLI
+  - Bash Shell
+  - JAVA v8+
+  - <a href="https://stedolan.github.io/jq/" target="_blank">jq CLI</a>
+- You need to have a SalesForce account. This should have been completed as part of the <a href="https://ibm-garage-tsa.github.io/cp4i-demohub/salesdemos/carrepair-new/prepare/#setting-up-salesforce" target="_blank">Tech Academy pre-requisite work</a>.
+- You need to have a mailtrap account. This too should have been completed as part of the <a href="https://mailtrap.io/" target="_blank">Tech Academy pre-requisite work</a>.
+- You have access to GitHub Organization with all repositories. Your proctor will provide that for you.
+
+***
+
+## Business Context
+
+This document describes multiple use cases that highlight the multi-style integration patterns needed by an Integration Specialist to implement a digital transformation initiative that showcase the value Cloud Pak for Integration can provide.
+
+In this case a customer has a system of record that has used for many years which ws designed to work with MQ to process requirements, and now they want to extend the application to expose an API in a asecure way as part of their mobile app.
+
+But the requirement doesn't end there, they are also implementing a new CRM system as a Service and they want to keep both systems in sync without having to modify the original system of record.
+
+Additionally as part of their digital transformation initiative they want to stay closer to their clients and they want to send email notifications when the client is taking certain actions in their mobile app. To support this strategy, the enterprise architecture team wants to implement an event backbone, as part of their event driven architecture.
+
+The following diagram provides a high level view of the scenario:
+  ![](images/CP4I_MultiStyle_DemoScenario.png)
+
+In order to implement this demo you will need to deploy an instance of each one of the following components in your OCP Cluster:
+  - API Connect Cluster
+  - Event Streams Cluster
+  - Queue Manager
+  - App Connect Enterprise Integration Servers
+
+The following diagram provides a high level implementation view of the scenario with the core capabilities:
+  ![](images/CP4I_MultiStyle_HighLevelView.png)
+
+To demonstrate the added value capabilities provided by CP4I you will deploy an instance of the following components in your OCP Cluster:
+  - Platform UI (formerly known as Platform Navigator)
+  - Automation Foundation Assets (formerly known as Asset Repository)
+  - Operations Dashboard
+
+***
+
+## Automation Framework Introduction
+
+### What are the Production Deployment Guides?
+
+The <a href="https://production-gitops.dev/" target="_blank">Cloud Pak Production Deployment Guides</a> document and demonstrate how to design, deploy and operate cloud-native solutions leveraging IBM Cloud Pak capabilities in Red Hat OpenShift environments. The guides focus on Production level qualities of services such as High Availability, Security and Performance including how to design, install and manage your Cluster in the popular managed and unmanaged Cloud environments as well as tackling disconnected or air-gapped environments.
+
+
+### Production Deployment Guide objectives
+
+There are a number of objectives behind providing the Production Deployment Guides. The three main goals of the Guides are provided below:
+  - Provide opinionated, validated Production topologies
+  - Provide a GitOps driven automation framework
+  - Enable IBMers to setup Production topologies
+
+
+### What is GitOps?
+
+GitOps requires us to describe the entire system declaratively in Git where the desired system state is versioned, managed and applied by software agents.
+
+Automation is key for scale in the Cloud world and OpenShift and Cloud Paks are no different. The implementation code and artifacts provided along with these guides are based on a GitOps approach where infrastructure and everything deployed in to an OpenShift Cluster (including Cloud Paks) is described as code and is managed in the same way that application code would be.
+
+More information on the gitops structure can be read in this <a href="https://production-gitops.dev/gitops/structure/" target="_blank">page</a>.
+
+***
+
+## Lab Environment
+
+For this session you will use a ROKS 4.8 environment with 5 nodes (b3c.16x64). Following this video, you can have a personal environment for you, including GitOps operator and configuration. But for this section, your lab proctors pre-installed this cluster for you. They already installed GitOps, created an empty GitHub Organization and forked the automation repositories that you will use, for this empty organization (check the video to see the steps already completed).
+
+Because of time restrictions, the proctors already installed some core services of Cloud Pak for Integration, avoiding you to wait almost 90 minutes to complete this installation. In the previous sections, you will check what are installed in this environment.
+
+***
+
+## 0 - Preparation
+
+In this section you will do some initial steps to prepare your environment for the lab, including accept the Account Invitation in IBM Cloud, access your cluster web console and by command line interface. Let’s start it!
+
+1. Log in IBM Cloud.
+
+2. Open the **Notifications** page (click on top right ring bell icon).
+
+   ![](images/gitops-0-1.png)
+
+3. On the Notifications page, you should have an **Account** notification informing you that “You are invited to join an account in IBM Cloud”. Select this notification and click the **Join now** link.
+
+   ![](images/gitops-0-2.png)
+
+4. Follow the steps to accept the invitation.
+
+5. Now back to the IBM Cloud dashboard, change your IBM Cloud account to **2543884 - itztsglenablement05**.
+
+   ![](images/gitops-0-3.png)
+
+6. Now you have two possibilities, you can open the Team Environment page on the left of this menu and click to open your Cluster page (it is easy, isn’t?) or you can open the Openshift page on the IBM Cloud menu and look for your cluster in the *Clusters’ list*.
+
+7. On your cluster’s page, click **OpenShift web console**.
+
+8. Great, you are almost ready for the lab. Last but not least important, let’s copy login command to access the cluster by CLI. On the top right, click your **username** and select **Copy login command**.
+
+   ![](images/gitops-0-4.png)
+
+9. Click **Display Token**.
+
+10. Copy the **Login with this token** command  and paste on a terminal window.
+
+11. You should have received an invitation for the GitHub Organization of your team. Don't forget to accept it in your Github account email.
+
+    That is it! Now you are ready for the lab. Take a breath and enjoy your lab!
+
+***
+
+## 1 - Clone Repositories
+
+1. As explained before, you already have Github repositories for your team. On the left navigator menu, check the name of your cluster and GitHub organization. As soon as you have the name, let's clone the repositories in your local machine. Use the command below to define your GIT_ORG variable.
+
+```
+export GIT_ORG={REPLACE_WITH_YOUR_GIT_ORG}
+```
+
+2. Now let's clone the repositories to your local machine.
+```
+mkdir ${GIT_ORG}
+cd ${GIT_ORG}
+git clone https://github.com/${GIT_ORG}/multi-tenancy-gitops
+git clone https://github.com/${GIT_ORG}/multi-tenancy-gitops-infra
+git clone https://github.com/${GIT_ORG}/multi-tenancy-gitops-services
+git clone https://github.com/${GIT_ORG}/multi-tenancy-gitops-apps
+```
+
+3. You are welcome to explore all the four repositories of the GitOps Automation framework.
+
+
+***
+
+## 2 - Explore the Environment
+
+Now that you have all the repositories locally, let's check what have been deployed.
+
+1. Let's start by exploring the GitOps Automation Framework YAML files. First, let's check the kustomization.yaml in infra layer (/multi-tenancy-gitops/0-bootstrap/single-cluster/1-infra/).
+
+   `Challenge 2.1:` what namespaces are enabled? openshift console - check namespaces (tools ibm-common-services)
+
+2. Let's explore the kustomization.yaml in services layer (/multi-tenancy-gitops/0-bootstrap/single-cluster/2-services/)
+
+   `Challenge 2.2:` what are the instances enabled? How can you check Platform navigator and API Connect?
+
+3. Let's check the installed operators in your Cluster Web Console (there is a URL available in the Team Environments page).
+
+   `Challenge 2.3:` how do I see the Installed Operators in OpenShift web console?
+
+4. Now, let's open the ArgoCD UI. Don't forget to find the ArgoCD URL and admin's password. *Tip:* ArgoCD is installed in the openshift-gitops namespace, just look for an opaque (type) *openshift-gitops-cntk* in Secrets and an *openshift-gitops-cntk* Routes.
+
+   `Challenge 2.4:` Where do I see the ArgoCD URL? Where do I get the ArgoCD admin password?
+
+5. In ArgoCD UI check all applications available. Check the application's healthy status.
+
+6. Let's open the Platform navigator. *Tip:* All CP4I services are installed in the tools namespace. And secret name is *ibm-iam-bindinfo-platform-auth-idp-credentials*.
+
+   `Challenge 2.5:` Where do I see the Platform navigator URL? How do I get the CP4i admin's password?
+
+7. Check what the Integration's Instances are available.
+
+   `Challenge 2.6:` What are the instances available?
+
+***
+
+## 3 - Prepare the Subscription
+
+Now it's your time to do some actions using the GitOps Automation Framework. Let's start by preparing some subscriptions.
+
+1. Edit **multi-tenancy-gitops/0-bootstrap/single-cluster/2-services/kustomization.yaml**.
+
+2. Uncomment the lines below.
+```
+- argocd/operators/ibm-ace-operator.yaml
+- argocd/operators/ibm-eventstreams-operator.yaml
+- argocd/operators/ibm-mq-operator.yaml
+```
+
+3. In the multi-tenancy-gitops folder: Add, Commit and Push the changes to multi-tenancy-gitops repository.
+```
+git add .
+git commit -m "adding new operators"
+git push origin
+```
+
+4. Back to the argoCD console, refresh the **02-Services** application. Maybe you need to wait few minutes to make sure that all the status are Sync and Healthy, before progressing.
+
+   `Challenge 3.1:` What are the new applications available in ArgoCD?
+
+5. Back to the OpenShift Web console, check if there are new operators available.
+
+    `Challenge 3.2:` What are the new operators? How to check them?
+
+***
+
+## 4 - Deploy ACE and ES instances
+
+Now, let's create App Connect Enterprise and Event Streams instances using the GitOps Automation Framework.
+
+1. Edit **multi-tenancy-gitops/0-bootstrap/single-cluster/2-services/kustomization.yaml**.
+
+2. Uncomment the lines below.
+```
+- argocd/instances/es-demo.yaml
+- argocd/instances/ace-infra.yaml
+```
+
+3. In the multi-tenancy-gitops folder: Add, Commit and Push the changes to multi-tenancy-gitops repository.
+```
+git add .
+git commit -m "deploying ace and es"
+git push origin
+```
+
+4. Back to the argoCD console, refresh the **02-Services** application. Maybe you need to wait few minutes to make sure that all the status are Sync and Healthy, before progressing.
+
+   `Challenge 4.1:` What are the new applications available in ArgoCD?
+
+5. Back to the OpenShift Web console, check if there are new operators available.
+
+    `Challenge 4.2:` What are the new operators?
+
+6. Back to CP4i Platform Navigator, check if the new instances are available and ready.
+
+    `Challenge 4.3:` How to check if the instances are available in Platform Navigator?
+
+***
+
+## 5 - Activate MQ Queue Manager
+
+Now, let's start the application layer. First we need to create the MQ Queue Manager.
+
+1. Edit **multi-tenancy-gitops/0-bootstrap/single-cluster/3-apps/kustomization.yaml**.
+
+2. Uncomment the line below.
+```
+- argocd/sko-sample/mqmgr.yaml
+
+```
+
+3. In the multi-tenancy-gitops folder: Add, Commit and Push the changes to multi-tenancy-gitops repository.
+```
+git add .
+git commit -m "mq queue manager"
+git push origin
+```
+
+4. Back to the argoCD console, refresh the **03-Application** application. Maybe you need to wait few minutes to make sure that all the status are Sync and Healthy, before progressing.
+
+   `Challenge 5.1:` What are the new applications available in ArgoCD?
+
+5. On the OpenShift Web Console page, check the **qmgr-demo** are running.
+
+6. On the CP4i Platform Navigator page, check the Queue Managers.
+
+   `Challenge 5.2:` How many Queue Managers are available? How do you check them?
+
+***
+
+## 6 - Customize Event Streams
+
+Now, let's create the Event Streams resources for our Multi-Style demo.
+
+1. Edit **multi-tenancy-gitops/0-bootstrap/single-cluster/3-apps/kustomization.yaml**.
+
+2. Uncomment the line below.
+```
+- argocd/sko-sample/eventstream.yaml
+
+```
+
+3. In the multi-tenancy-gitops folder: Add, Commit and Push the changes to multi-tenancy-gitops repository.
+```
+git add .
+git commit -m "customize ES"
+git push origin
+```
+
+4. Back to the argoCD console, refresh the **03-Application** application. Maybe you need to wait few minutes to make sure that all the status are Sync and Healthy, before progressing.
+
+5. Open the **eventstream** application and check the log of **es-demo-setup-job-???** pod.
+
+6. You should see a failure that statefulsets.apps is forbidden. Let's fix it! Edit **multi-tenancy-gitops-apps/sko-sample/eventstream/es-demo-setup-job-sa-role.yaml**.
+
+7. In the Rules section, create a new rule with the content below and save the new YAML file.
+```
+- apiGroups: ["apps"]
+  resources: ["statefulsets"]
+  verbs: ["get", "watch", "list"]
+```
+
+8. In the multi-tenancy-gitops-apps folder: Add, Commit and Push the changes to multi-tenancy-gitops-apps repository.
+```
+git add .
+git commit -m "apps statefulsets permission"
+git push origin
+```
+
+9. Back to the argoCD console, refresh the **eventstream** application. Maybe you need to wait few minutes to make sure that all the status are Sync and Healthy.
+
+10. Now you need to delete **es-demo-setup-job** to re-run the pod.
+
+11. Now let's check the log of **es-demo-setup-job-???** pod again.
+
+12. Wow, another failure!! Now with route. Follow the same approach of the previous error, but now include a rule to resources **routes** in the apiGroups **route.openshift.io** and repeat the same verbs of the previous rule.
+
+13. Repeat steps 8 to 11, to deploy the changes.
+
+***
+
+## 7 - Configure ACE
+
+Now, let's work with Application Connect Enterprise. In this part, you are configuring artifacts, secrets and certificates.
+
+1. Open the **multi-tenancy-gitops-apps/sko-sample/ace-00-configs** folder.
+
+2. Execute the commands below to generate the configuration YAML files.
+    - SF_USER is *[Email addess used to log into Salesforce]*
+    - SF_PWD is *[Password used to log in][token received in email]*
+    - SF_CLIENT_ID is *[Consumer Key]*
+    - SF_CLIENT_SECRET is *[Consumer Secret]*
+    - MAILTRAP_USER is *[Mailtrap SMTP User]*
+    - MAILTRAP_PWD is *[Mailtrap SMTP Password]*
+
+```
+./06-ace-config-barauth-github.sh
+./07-ace-config-policy-mq.sh
+SF_USER=<my-sf-user> SF_PWD=<my-sf-pwd> SF_CLIENT_ID=<my-sf-client-id> SF_CLIENT_SECRET=<my-sf-client-secret> SF_LOGIN_URL="https://login.salesforce.com" ./08-ace-config-accounts-sf.sh
+./10-ace-config-policy-es-scram.sh
+./11-ace-config-setdbparms-es-scram.sh
+./12-ace-config-truststore-es.sh
+./13-ace-config-policy-udp.sh
+./14-ace-config-policy-email.sh
+MAILTRAP_USER=<user> MAILTRAP_PWD=<pwd> ./15-ace-config-setdbparms-email.sh
+```
+
+3. Verify that there are 9 YAML files generated in the *ace-00-configs* folder.
+
+4. Edit **multi-tenancy-gitops-apps/sko-sample/ace-00-configs/kustomization.yaml** file.
+
+5. Uncomment the lines below (all the content).
+```
+- ace-config-accounts-designer.yaml
+
+- ace-config-policy-es-scram.yaml
+- ace-config-setdbparms-es-scram.yaml
+- ace-config-truststore.yaml
+
+- ace-config-policy-udp.yaml
+- ace-config-policy-email.yaml
+- ace-config-setdbparms-email.yaml
+
+```
+
+6. In the multi-tenancy-gitops-apps folder: Add, Commit and Push the changes to multi-tenancy-gitops-apps repository.
+```
+git add .
+git commit -m "ace config"
+git push origin
+```
+
+7. Edit **multi-tenancy-gitops/0-bootstrap/single-cluster/3-apps/kustomization.yaml** file.
+
+8. Uncomment the lines below (all the content).
+```
+- argocd/sko-sample/ace-00-configs.yaml
+- argocd/sko-sample/ace-backend.yaml
+- argocd/sko-sample/ace-evnt2mail.yaml
+- argocd/sko-sample/ace-fwdmqevnt.yaml
+- argocd/sko-sample/ace-mqapidflt.yaml
+- argocd/sko-sample/ace-mqapiprem.yaml
+- argocd/sko-sample/ace-sflead.yaml
+```
+
+9. In the multi-tenancy-gitops folder: Add, Commit and Push the changes to multi-tenancy-gitops-apps repository.
+```
+git add .
+git commit -m "ace config"
+git push origin
+```
+
+10. Back to the argoCD console, refresh the **03-Application** application. Maybe you need to wait few minutes to make sure that all the status are Sync and Healthy, before progressing.
+
+11. Back to Platform Navigator, open **App Connect Dashboard** (Run > Integration) and check the Integration servers.
+
+***
+
+## 8 - Customize APIC
+
+Now, let's create the Provider Organization and Publish the API in APIC.
+
+1. Go to the folder **multi-tenancy-gitops-apps/sko-sample/apic-cust**.
+
+2. Now let's configure APIC to submit emails when necessary (e.g.: Portal Users registration). Run the script to generate the APIC mail secret using Mailtrap.
+   - MAILTRAP_USER is *[Mailtrap SMTP User]*
+   - MAILTRAP_PWD is *[Mailtrap SMTP Password]*
+
+```
+MAILTRAP_USER=<user> MAILTRAP_PWD=<pwd> ./apic-user-mail-secret.sh
+```
+
+3. Check that you have a Secret YAML file in your folder.
+
+4. In the multi-tenancy-gitops-apps folder: Add, Commit and Push the changes to multi-tenancy-gitops repository.
+```
+git add .
+git commit -m "apic user mail secret"
+git push origin
+```
+
+5. Edit **multi-tenancy-gitops/0-bootstrap/single-cluster/3-apps/kustomization.yaml**.
+
+6. Uncomment the line below.
+```
+- argocd/sko-sample/apic-cust.yaml
+
+```
+
+7. In the multi-tenancy-gitops folder: Add, Commit and Push the changes to multi-tenancy-gitops repository.
+```
+git add .
+git commit -m "apic customization"
+git push origin
+```
+
+8. Back to the argoCD console, refresh the **03-Application** application. Maybe you need to wait few minutes to make sure that all the status are Sync and Healthy, before progressing.
+
+9. Open the **apic-cust** application. Check if the apic-setup job is successful (look at the pod's logs).
+
+10. Great, now you are ready to publish your API. Back to the OpenShift Console, open the **Pods** page (Workloads > Pods), on the **tools** namespace, filter by the word **publish**.
+
+11. Open the pod, and go to the **Terminal** tab.
+
+12. In the Terminal session, run **./apic-publish-api.sh**.
+
+13. Feel free to accept or not the limited usage tracking.
+
+14. You need to authenticate in APIC to publish the API. Let's do it! Open the URL provided in a different browser session.
+
+15. If necessary log in APIC with your admin and password.
+
+16. Copy the code to the Terminal tab to continue the publish process.
+
+17. Great, your API is published successfully.
+
+***
+
+## 9 - Check the Demo Assets
+
+Great, in this part of the lab, you will check the Demo environment and assets. On the other hand, you will collect all the evidences to prove that you were able to complete the lab (check the 3 screenshots notes).
+
+1. Back to ArgoCD page, go to the main page, and check all the 35 applications are healthy.
+
+   ``SCREENSHOT 1`` - Take a screenshot of the main ArgoCD page showing 35 applications healthy. Please include your browser adddres bar showing your cluster URL.
+
+2. Now, let's test your demo. Open the Platform Navigator page and go to the **Integration Instances** view.
+
+3. Here you should see all the integrations as Ready.
+
+   ``SCREENSHOT 2`` - Take a screenshot of the Integration Instances page with all instances as ready. Please include your browser adddres bar showing your cluster URL.
+
+4. Then, open the **API Manager** (Run > API).
+
+5. Click **Develop APIs and products**. And select **JGRMQAPI**.
+
+6. Put your API **online**.
+
+7. Now, let's try it! Open the **Explorer** tab.
+
+8. Click on **POST /contacts**.
+
+9. Open **Try it**.
+
+10. On the Body section, click **Generate** to create a request body sample.
+
+11. Click **Send**.
+
+12. If you received 200 response, your request has been processed (success).
+    *Note:* if you receive a CORS issue. Open the URL, accept the risks and try again.
+
+13. Now, let's check the **Integration Trace** page (Operate > Integration Trace).
+
+14. Close the *What's New* dialog and accept the license.
+
+15. Open the **Traces** view.
+
+16. Select the entry that has all APIC ACE and MQ components in the services column.
+
+17. Great, here you should have the integrated trace graph with 10 nodes, including all the demo components.
+
+   ``SCREENSHOT 3`` - Take a screenshot of the Integrated Tracepage showing all the demo components (10 nodes). Please include your browser adddres bar showing your cluster URL.
+
+***
+
+## Summary
+
+You have successfully completed this lab. In this lab you learned:
+  - the IBM opinionated point of view regarding a GitOps centric method to manage RHOCP infrastructure, IBM integration software and application workload code (three tier GitOps architecture).
+  - how to develop, review, and extend an IBM GitOps automation repository that incapsulate key software components within the IBM Integration portfolio.
+  - how to position a GitOps automation framework as a key boot-strapping and operational mechanism supporting a Client PoC activity and Client adoption.
+
+Check <a href="https://youtu.be/oTrtd9eKU8E" target="blank">this video</a> later, if you want to learn how to deliver a demo using this demo environment.
+
+So far we have focused on the "runtime" aspect of the deployment, but to provide a full demo experience, in some cases you will need to walk a customer through the assets that make up the demo scenario. If you want to have the developer experience in your demo/POC, check <a href="https://github.ibm.com/joel-gomez/cp4i-demo#developer-experience" target="_blank">here</a> how to do it.
