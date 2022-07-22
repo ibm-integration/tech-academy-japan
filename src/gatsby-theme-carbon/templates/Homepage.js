@@ -3,7 +3,7 @@ import { HomepageBanner, HomepageCallout } from 'gatsby-theme-carbon';
 import HomepageTemplate from 'gatsby-theme-carbon/src/templates/Homepage';
 import { calloutLink } from './Homepage.module.scss';
 
-import Carbon from '../../images/hursley.jpg';
+import Carbon from '../../images/japan.jpg';
 
 const FirstLeftText = () => <p>This page is designed to be a single point of access for all Assets about SKO Technical Academy - Integration</p>;
 
