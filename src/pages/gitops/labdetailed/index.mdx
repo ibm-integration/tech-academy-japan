@@ -213,23 +213,60 @@ vi multi-tenancy-gitops/0-bootstrap/single-cluster/1-infra/kustomization.yaml
 
 ```
 
-  Check that **tools** and **ibm-common-services** are the namespaces enabled.
+  Check that **tools** and **ibm-common-services** are the namespaces enabled. We will explore these namespaces in OpenShift later. Go ahead and close vi.
+
+![](images/explore1.png)
 
 2. Let's explore the kustomization.yaml in services layer (/multi-tenancy-gitops/0-bootstrap/single-cluster/2-services/)
 
-   `Challenge 2.2:` what are the instances enabled? How can you check Platform navigator and API Connect?
+```
+vi multi-tenancy-gitops/0-bootstrap/single-cluster/2-services/kustomization.yaml
 
-3. Let's check the installed operators in your Cluster Web Console (there is a URL available in the Team Environments page).
+```
 
-   `Challenge 2.3:` how do I see the Installed Operators in OpenShift web console?
+  Here you can check that Platform Navigator, Asset Repository, API Connect and others are already installed in your environment. Don't worry, in next steps you will install other operators and create new instances.
 
-4. Now, let's open the ArgoCD UI. Don't forget to find the ArgoCD URL and admin's password. *Tip:* ArgoCD is installed in the openshift-gitops namespace, just look for an opaque (type) *openshift-gitops-cntk* in Secrets and an *openshift-gitops-cntk* Routes.
+![](images/explore2.png)
 
-   `Challenge 2.4:` Where do I see the ArgoCD URL? Where do I get the ArgoCD admin password?
+3. Let's check the installed operators in your Cluster Web Console. You should have the web console page opened, if not, there is a URL available in the Team Environments page.
 
-5. In ArgoCD UI check all applications available. Check the application's healthy status.
+  On Web Console page, open **Operators** (A), then **Installed Operators** (B). Here you can see all the installed operators (C).
 
-6. Let's open the Platform navigator. *Tip:* All CP4I services are installed in the tools namespace. And secret name is *ibm-iam-bindinfo-platform-auth-idp-credentials*.
+![](images/explore3.png)
+
+4. Now, let's open the ArgoCD UI. Let's get the ArgoCD Admin's password first. On Web Console page, open **Workloads** (A) > **Secrets** (B).
+
+![](images/explore4_1.png)
+
+   Filter by **openshift-gitops** project (A) and open the **openshift-gitops-cntk-cluster** (B).
+
+![](images/explore4_2.png)
+
+   Scroll down and click to copy the **admin.password**. You are welcome to take note of this password.
+
+![](images/explore4_3.png)
+
+5. Now, let's get the ArgoCD URL. Open **Networking** (A) and **Routes** (B).
+
+![](images/explore5_1.png)
+
+   Click on the **openshift-gitops-cntk-server** location to open the ArgoCD URL.
+
+![](images/explore5_2.png)
+
+  If necessary, accept all the risks, and log in with **admin** user and the password that you copied in the previous step. `Note:` Don't log in via openshift, because your openshift user doesn't have write permission.
+
+![](images/explore5_3.png)
+
+6. Now, you are in Argo CD. Argo CD is a declarative, GitOps continuous delivery tool for Kubernetes. Here you can see all the applications. In Argo CD, application definitions, configurations, and environments should be declarative and version controlled. Application deployment and lifecycle management should be automated, auditable, and easy to understand.
+
+   As you can see, you have 20 **healthy** applications in your environment (A), including **ibm-platform-navigator** (B). You are welcome to explore the Applications tiles page to see the other applications available.
+
+![](images/explore6.png)
+
+7. Great, now let's check your Cloud Pak for Integration environment. First we need to get the Platform Navigator URL and password. Let's do it! Back to the OpenShift Web Console, open...
+
+   Let's open the Platform navigator. *Tip:* All CP4I services are installed in the tools namespace. And secret name is *ibm-iam-bindinfo-platform-auth-idp-credentials*.
 
    `Challenge 2.5:` Where do I see the Platform navigator URL? How do I get the CP4i admin's password?
 
