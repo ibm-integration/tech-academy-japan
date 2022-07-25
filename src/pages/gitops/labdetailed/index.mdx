@@ -169,11 +169,11 @@ In this section you will do some initial steps to prepare your environment for t
 
 ![](images/display-token.png)
 
-11. Copy the **Login with this token** command  and paste on a terminal window.
+11. Copy the **Log in with this token** command  and paste on a terminal window.
 
 ![](images/login-cmd.png)
 
-   'Note': You should have received an invitation for the GitHub Organization of your team. Don't forget to accept it in your Github account email.
+   `Notes`: You should have received an invitation for the GitHub Organization of your team. Don't forget to accept it in your Github account email.
 
     That is it! Now you are ready for the lab. Take a breath and enjoy your lab!
 
@@ -181,7 +181,7 @@ In this section you will do some initial steps to prepare your environment for t
 
 ## 1 - Clone Repositories
 
-1. As explained before, you already have Github repositories for your team. On the left navigator menu, check the name of your cluster and GitHub organization. As soon as you have the name, let's clone the repositories in your local machine. Use the command below to define your GIT_ORG variable.
+1. As explained before, you already have Github repositories for your team. On previous section, you took notes of your GitHub organization's name. Now that you have the name, let's clone the repositories in your local machine. Back to the terminal window, use the command below to define your GIT_ORG variable.
 
 ```
 export GIT_ORG={REPLACE_WITH_YOUR_GIT_ORG}
@@ -208,7 +208,12 @@ Now that you have all the repositories locally, let's check what have been deplo
 
 1. Let's start by exploring the GitOps Automation Framework YAML files. First, let's check the kustomization.yaml in infra layer (/multi-tenancy-gitops/0-bootstrap/single-cluster/1-infra/).
 
-   `Challenge 2.1:` what namespaces are enabled? openshift console - check namespaces (tools ibm-common-services)
+```
+vi multi-tenancy-gitops/0-bootstrap/single-cluster/1-infra/kustomization.yaml
+
+```
+
+  Check that **tools** and **ibm-common-services** are the namespaces enabled.
 
 2. Let's explore the kustomization.yaml in services layer (/multi-tenancy-gitops/0-bootstrap/single-cluster/2-services/)
 
