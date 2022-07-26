@@ -563,7 +563,6 @@ MAILTRAP_USER=<user> MAILTRAP_PWD=<pwd> ./15-ace-config-setdbparms-email.sh
 3. Verify that there are 9 YAML files generated in the *ace-00-configs* folder.
 ```
 ls *.yaml
-
 ```
 
 ![](images/ace-3_1.png)
@@ -630,18 +629,17 @@ git push origin
 
 ![](images/ace-10_2.png)
 
-11. Back to Platform Navigator, open **App Connect Dashboard** (Menu > Run > Integration).
+11. Back to Platform Navigator, open **App Connect Dashboard** (Menu > Run > Integrations).
 
 ![](images/ace-11_1.png)
 
-    Open **Servers**.
+   Open **Servers**.
 
 ![](images/ace-11_2.png)
 
    Check the Integration servers.
 
 ![](images/ace-11_3.png)
-
 
 
 ***
@@ -651,6 +649,11 @@ git push origin
 Now, let's create the Provider Organization and Publish the API in APIC.
 
 1. Go to the folder **multi-tenancy-gitops-apps/sko-sample/apic-cust**.
+```
+cd
+
+```
+
 
 2. Now let's configure APIC to submit emails when necessary (e.g.: Portal Users registration). Run the script to generate the APIC mail secret using Mailtrap.
    - MAILTRAP_USER is *[Mailtrap SMTP User]*
