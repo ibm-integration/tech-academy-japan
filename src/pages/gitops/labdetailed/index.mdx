@@ -264,15 +264,45 @@ vi multi-tenancy-gitops/0-bootstrap/single-cluster/2-services/kustomization.yaml
 
 ![](images/explore6.png)
 
-7. Great, now let's check your Cloud Pak for Integration environment. First we need to get the Platform Navigator URL and password. Let's do it! Back to the OpenShift Web Console, open...
+7. Great, now let's check your Cloud Pak for Integration environment. First we need to get the Platform Navigator URL and password. Let's do it! Back to the OpenShift Web Console, open **Workloads** (A) and **Secrets** (B) again.
 
-   Let's open the Platform navigator. *Tip:* All CP4I services are installed in the tools namespace. And secret name is *ibm-iam-bindinfo-platform-auth-idp-credentials*.
+![](images/explore7_1.png)
 
-   `Challenge 2.5:` Where do I see the Platform navigator URL? How do I get the CP4i admin's password?
+   Now filter by **tools** project (A) and open the **ibm-iam-bindinfo-platform-auth-idp-credentials** secret (B).
 
-7. Check what the Integration's Instances are available.
+![](images/explore7_2.png)
 
-   `Challenge 2.6:` What are the instances available?
+   Scroll down and click to copy the **admin_password**. You are welcome to take note of this password.
+
+![](images/explore7_3.png)
+
+8. Now, let's get the Platform Navigator URL. Open **Networking** (A) and **Routes** (B).
+
+![](images/explore8_1.png)
+
+   Scroll down and click on the **integration-navigator-pn** location to open the Platform Navigator.
+
+![](images/explore8_2.png)
+
+   If necessary, accept all the risks, and click **IBM provided credentials (admin only)** link.
+
+![](images/explore8_3.png)
+
+   Log in with **admin** user and the password that you copied in the previous step.
+
+![](images/explore8_4.png)
+
+9. Now, let's explore the CP4I. Close the **Welcome** dialog.
+
+![](images/explore9_1.png)
+
+   Let's check the instances available. Click on **Integration instances** link.
+
+![](images/explore9_2.png)
+
+   Great, here you can check that your API Management (including Gateway and Admin), Automation Assets and Integration tracing are *Ready** to be used.
+
+![](images/explore9_3.png)
 
 ***
 
@@ -282,7 +312,13 @@ Now it's your time to do some actions using the GitOps Automation Framework. Let
 
 1. Edit **multi-tenancy-gitops/0-bootstrap/single-cluster/2-services/kustomization.yaml**.
 
-2. Uncomment the lines below.
+```
+cd multi-tenancy-gitops
+vi 0-bootstrap/single-cluster/2-services/kustomization.yaml
+
+```
+
+2. Uncomment the lines below to enablle the ACE, MQ and Event Streams operators. Then close and save the YAML file.
 ```
 - argocd/operators/ibm-ace-operator.yaml
 - argocd/operators/ibm-eventstreams-operator.yaml
@@ -296,13 +332,18 @@ git commit -m "adding new operators"
 git push origin
 ```
 
-4. Back to the argoCD console, refresh the **02-Services** application. Maybe you need to wait few minutes to make sure that all the status are Sync and Healthy, before progressing.
+4. Now let's check the operators installation in Argo CD. Back to the Argo CD console, refresh the **02-Services** application. Maybe you need to wait few minutes to make sure that all the status are Sync and Healthy, before progressing.
 
-   `Challenge 3.1:` What are the new applications available in ArgoCD?
+![](images/subscription-4.png)
 
-5. Back to the OpenShift Web console, check if there are new operators available.
+   When completed, you should have **23** healthy applications (A), including *ibm-ace-operator*, *ibm-mq-operator* and *ibm-eventstreams-operator* (B).
 
-    `Challenge 3.2:` What are the new operators? How to check them?
+![](images/subscription-4_2.png)
+
+5. Back to the OpenShift Web console, open again **Operators** (A), **Installed Operators** (B). Check the new three operators in the list (C).
+
+![](images/subscription-5.png)
+
 
 ***
 
