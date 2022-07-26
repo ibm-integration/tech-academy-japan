@@ -315,7 +315,6 @@ Now it's your time to do some actions using the GitOps Automation Framework. Let
 ```
 cd multi-tenancy-gitops
 vi 0-bootstrap/single-cluster/2-services/kustomization.yaml
-
 ```
 
 2. Uncomment the lines below to enablle the ACE, MQ and Event Streams operators. Then close and save the YAML file.
@@ -351,9 +350,12 @@ git push origin
 
 Now, let's create App Connect Enterprise and Event Streams instances using the GitOps Automation Framework.
 
-1. Edit **multi-tenancy-gitops/0-bootstrap/single-cluster/2-services/kustomization.yaml**.
+1. Back to the terminal window. In *multi-tenancy-gitops*, edit the file below.
+```
+vi 0-bootstrap/single-cluster/2-services/kustomization.yaml
+```
 
-2. Uncomment the lines below.
+2. In the CP4I for SKO section, uncomment the lines below. Then close and save the YAML file.
 ```
 - argocd/instances/es-demo.yaml
 - argocd/instances/ace-infra.yaml
@@ -368,15 +370,15 @@ git push origin
 
 4. Back to the argoCD console, refresh the **02-Services** application. Maybe you need to wait few minutes to make sure that all the status are Sync and Healthy, before progressing.
 
-   `Challenge 4.1:` What are the new applications available in ArgoCD?
+![](images/instances-4_1.png)
 
-5. Back to the OpenShift Web console, check if there are new operators available.
+   When completed, you should have **25** healthy applications (A), including *es-demo* and *ace-infra* (B).
 
-    `Challenge 4.2:` What are the new operators?
+![](images/instances-4_2.png)
 
-6. Back to CP4i Platform Navigator, check if the new instances are available and ready.
+5. Now, let's check the new instances in CP4I Platform Navigator. Refresh the Integration instances pages (Menu > Administration > Integration instances), and check if the new instances are available and ready. `Note`: ignore the warning in Kafka cluster, it is only informing about a new version.
 
-    `Challenge 4.3:` How to check if the instances are available in Platform Navigator?
+![](images/instances-5.png)
 
 ***
 
@@ -384,9 +386,12 @@ git push origin
 
 Now, let's start the application layer. First we need to create the MQ Queue Manager.
 
-1. Edit **multi-tenancy-gitops/0-bootstrap/single-cluster/3-apps/kustomization.yaml**.
+1. Back to the terminal window. In *multi-tenancy-gitops*, edit the file below.
+```
+vi 0-bootstrap/single-cluster/3-apps/kustomization.yaml
+```
 
-2. Uncomment the line below.
+2. In the *SKO sample apps* section, uncomment the line below. Then close and save the YAML file.
 ```
 - argocd/sko-sample/mqmgr.yaml
 
@@ -401,13 +406,31 @@ git push origin
 
 4. Back to the argoCD console, refresh the **03-Application** application. Maybe you need to wait few minutes to make sure that all the status are Sync and Healthy, before progressing.
 
-   `Challenge 5.1:` What are the new applications available in ArgoCD?
+![](images/queue-4_1.png)
 
-5. On the OpenShift Web Console page, check the **qmgr-demo** are running.
+   When completed, you should have **26** healthy applications (A), including *mqmgr* (B).
 
-6. On the CP4i Platform Navigator page, check the Queue Managers.
+![](images/queue-4_2.png)
 
-   `Challenge 5.2:` How many Queue Managers are available? How do you check them?
+5. On the OpenShift Web Console page, open **Workloads** (A), and **Pods** (B).
+
+![](images/queue-5_1.png)
+
+   Filter by **qmgr-demo** pods (A) and check if they are running (B).
+
+![](images/queue-5_2.png)
+
+6. On the CP4i Platform Navigator page, refresh the Instagration instances page and open the **qmgr-demo**.
+
+![](images/queue-6_1.png)
+
+   On the MQ Console, click on **Manage QMGRDEMO**.
+
+![](images/queue-6_2.png)
+
+   Here you can check the Queue Manager.
+
+![](images/queue-6_3.png)
 
 ***
 
@@ -415,9 +438,12 @@ git push origin
 
 Now, let's create the Event Streams resources for our Multi-Style demo.
 
-1. Edit **multi-tenancy-gitops/0-bootstrap/single-cluster/3-apps/kustomization.yaml**.
+1. Back to the terminal window. In *multi-tenancy-gitops*, edit the file below.
+```
+vi 0-bootstrap/single-cluster/3-apps/kustomization.yaml
+```
 
-2. Uncomment the line below.
+2. In the *SKO sample apps* section, uncomment the line below. Then close and save the YAML file.
 ```
 - argocd/sko-sample/eventstream.yaml
 
@@ -432,33 +458,76 @@ git push origin
 
 4. Back to the argoCD console, refresh the **03-Application** application. Maybe you need to wait few minutes to make sure that all the status are Sync and Healthy, before progressing.
 
-5. Open the **eventstream** application and check the log of **es-demo-setup-job-???** pod.
+![](images/es-4_1.png)
 
-6. You should see a failure that statefulsets.apps is forbidden. Let's fix it! Edit **multi-tenancy-gitops-apps/sko-sample/eventstream/es-demo-setup-job-sa-role.yaml**.
+   When completed, you should have **27** healthy applications (A), including *eventstream* (B).
+
+![](images/es-4_2.png)
+
+5. Open the **eventstream** application.
+
+![](images/es-5_1.png)
+
+   Open the **es-demo-setup-job-???** pod.
+
+![](images/es-5_2.png)
+
+   Open the **LOGS** tab.
+
+![](images/es-5_3.png)
+
+6. You should see a failure that statefulsets.apps is forbidden.
+
+![](images/es-6_1.png)
+
+   Let's fix it! Back to the terminal window, go to the *multi-tenancy-gitops-apps* folder and edit the file below.
+```
+cd ../multi-tenancy-gitops-apps/
+vi sko-sample/eventstream/es-demo-setup-job-sa-role.yaml
+```
 
 7. In the Rules section, create a new rule with the content below and save the new YAML file.
 ```
 - apiGroups: ["apps"]
   resources: ["statefulsets"]
   verbs: ["get", "watch", "list"]
+- apiGroups: ["route.openshift.io"]
+  resources: ["routes"]
+  verbs: ["get", "watch", "list"]
 ```
+
+![](images/es-7_1.png)
 
 8. In the multi-tenancy-gitops-apps folder: Add, Commit and Push the changes to multi-tenancy-gitops-apps repository.
 ```
 git add .
-git commit -m "apps statefulsets permission"
+git commit -m "adding rules"
 git push origin
 ```
 
 9. Back to the argoCD console, refresh the **eventstream** application. Maybe you need to wait few minutes to make sure that all the status are Sync and Healthy.
 
-10. Now you need to delete **es-demo-setup-job** to re-run the pod.
+![](images/es-9_1.png)
 
-11. Now let's check the log of **es-demo-setup-job-???** pod again.
+10. Now you need to delete **es-demo-setup-job** to re-run the pod. Open the context menu in **es-demo-setup-job** (A) and select **Delete** (B).
 
-12. Wow, another failure!! Now with route. Follow the same approach of the previous error, but now include a rule to resources **routes** in the apiGroups **route.openshift.io** and repeat the same verbs of the previous rule.
+![](images/es-10_1.png)
 
-13. Repeat steps 8 to 11, to deploy the changes.
+   Enter **es-demo-setup-job** (A) to confirm the deletion and click **OK** (B).
+
+![](images/es-10_2.png)
+
+   Wait few seconds to recreate the job and pod. When ready, click on the **es-demo-setup-job-???** pod again.
+
+![](images/es-5_2.png)
+
+   Open the **LOGS** tab again.
+
+![](images/es-5_3.png)
+
+   Great! Now you should not see any error message.
+
+![](images/es-10_3.png)
 
 ***
 
@@ -466,9 +535,12 @@ git push origin
 
 Now, let's work with Application Connect Enterprise. In this part, you are configuring artifacts, secrets and certificates.
 
-1. Open the **multi-tenancy-gitops-apps/sko-sample/ace-00-configs** folder.
+1. Back to the terminal window. In *multi-tenancy-gitops-apps* folder, open the folder below.
+```
+cd sko-sample/ace-00-configs/
+```
 
-2. Execute the commands below to generate the configuration YAML files.
+2. Execute the commands below to generate the configuration YAML files. Where:
     - SF_USER is *[Email addess used to log into Salesforce]*
     - SF_PWD is *[Password used to log in][token received in email]*
     - SF_CLIENT_ID is *[Consumer Key]*
@@ -489,10 +561,19 @@ MAILTRAP_USER=<user> MAILTRAP_PWD=<pwd> ./15-ace-config-setdbparms-email.sh
 ```
 
 3. Verify that there are 9 YAML files generated in the *ace-00-configs* folder.
+```
+ls *.yaml
+
+```
+
+![](images/ace-3_1.png)
 
 4. Edit **multi-tenancy-gitops-apps/sko-sample/ace-00-configs/kustomization.yaml** file.
+```
+vi kustomization.yaml
+```
 
-5. Uncomment the lines below (all the content).
+5. Uncomment the lines below (all the content). Then save and close the YAML file.
 ```
 - ace-config-accounts-designer.yaml
 
@@ -506,16 +587,24 @@ MAILTRAP_USER=<user> MAILTRAP_PWD=<pwd> ./15-ace-config-setdbparms-email.sh
 
 ```
 
+![](images/ace-5_1.png)
+
 6. In the multi-tenancy-gitops-apps folder: Add, Commit and Push the changes to multi-tenancy-gitops-apps repository.
 ```
+cd ../../
 git add .
 git commit -m "ace config"
 git push origin
 ```
 
-7. Edit **multi-tenancy-gitops/0-bootstrap/single-cluster/3-apps/kustomization.yaml** file.
+7. Now, go to *multi-tenancy-gitops* folder and edit **multi-tenancy-gitops/0-bootstrap/single-cluster/3-apps/kustomization.yaml** file.
+```
+cd ../multi-tenancy-gitops/
+vi 0-bootstrap/single-cluster/3-apps/kustomization.yaml
 
-8. Uncomment the lines below (all the content).
+```
+
+8. In the SKO sample apps section, uncomment the lines below. Then save and close the YAML file.
 ```
 - argocd/sko-sample/ace-00-configs.yaml
 - argocd/sko-sample/ace-backend.yaml
@@ -533,9 +622,27 @@ git commit -m "ace config"
 git push origin
 ```
 
-10. Back to the argoCD console, refresh the **03-Application** application. Maybe you need to wait few minutes to make sure that all the status are Sync and Healthy, before progressing.
+10. Back to the argoCD console, go to the **Applications** dashboard. And refresh the **03-Application** application. Maybe you need to wait few minutes to make sure that all the status are Sync and Healthy, before progressing.
 
-11. Back to Platform Navigator, open **App Connect Dashboard** (Run > Integration) and check the Integration servers.
+![](images/ace-10_1.png)
+
+   When completed, you should have **34** healthy applications (A), including *ace-sflead* and *ace-evnt2mail* (B).
+
+![](images/ace-10_2.png)
+
+11. Back to Platform Navigator, open **App Connect Dashboard** (Menu > Run > Integration).
+
+![](images/ace-11_1.png)
+
+    Open **Servers**.
+
+![](images/ace-11_2.png)
+
+   Check the Integration servers.
+
+![](images/ace-11_3.png)
+
+
 
 ***
 
