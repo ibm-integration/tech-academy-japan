@@ -650,12 +650,12 @@ Now, let's create the Provider Organization and Publish the API in APIC.
 
 1. Go to the folder **multi-tenancy-gitops-apps/sko-sample/apic-cust**.
 ```
-cd
+cd ../multi-tenancy-gitops-apps/sko-sample/apic-cust
 
 ```
 
 
-2. Now let's configure APIC to submit emails when necessary (e.g.: Portal Users registration). Run the script to generate the APIC mail secret using Mailtrap.
+2. Now let's configure APIC to submit emails when necessary (e.g.: Portal Users registration). Run the script to generate the APIC mail secret using Mailtrap. Where:
    - MAILTRAP_USER is *[Mailtrap SMTP User]*
    - MAILTRAP_PWD is *[Mailtrap SMTP Password]*
 
@@ -664,17 +664,26 @@ MAILTRAP_USER=<user> MAILTRAP_PWD=<pwd> ./apic-user-mail-secret.sh
 ```
 
 3. Check that you have a Secret YAML file in your folder.
+```
+ls *secret.yaml
+```
 
 4. In the multi-tenancy-gitops-apps folder: Add, Commit and Push the changes to multi-tenancy-gitops repository.
 ```
+cd ../../
 git add .
 git commit -m "apic user mail secret"
 git push origin
 ```
 
-5. Edit **multi-tenancy-gitops/0-bootstrap/single-cluster/3-apps/kustomization.yaml**.
+5. Go to the *multi-tenancy-gitops* folder and edit the file **multi-tenancy-gitops/0-bootstrap/single-cluster/3-apps/kustomization.yaml**.
+```
+cd ../multi-tenancy-gitops/
+vi 0-bootstrap/single-cluster/3-apps/kustomization.yaml
+```
 
-6. Uncomment the line below.
+
+6. In the *SKO sample apps* section, uncomment the line below. Then save and close the YAML file.
 ```
 - argocd/sko-sample/apic-cust.yaml
 
@@ -689,23 +698,66 @@ git push origin
 
 8. Back to the argoCD console, refresh the **03-Application** application. Maybe you need to wait few minutes to make sure that all the status are Sync and Healthy, before progressing.
 
-9. Open the **apic-cust** application. Check if the apic-setup job is successful (look at the pod's logs).
+![](images/apic-8_1.png)
 
-10. Great, now you are ready to publish your API. Back to the OpenShift Console, open the **Pods** page (Workloads > Pods), on the **tools** namespace, filter by the word **publish**.
+   When completed, you should have **35** healthy applications (A), including *apic-cust*(B).
 
-11. Open the pod, and go to the **Terminal** tab.
+![](images/apic-8_2.png)
 
-12. In the Terminal session, run **./apic-publish-api.sh**.
+9. Open the **apic-cust** application.
 
-13. Feel free to accept or not the limited usage tracking.
+![](images/apic-9_1.png)
 
-14. You need to authenticate in APIC to publish the API. Let's do it! Open the URL provided in a different browser session.
+   Open the **apim-demo-setup-job**.
 
-15. If necessary log in APIC with your admin and password.
+![](images/apic-9_2.png)
 
-16. Copy the code to the Terminal tab to continue the publish process.
+  Open the **LOGS** tab.
 
-17. Great, your API is published successfully.
+![](images/apic-9_3.png)
+
+   Check the log to confirm that the apic-setup job is successful.
+
+![](images/apic-9_4.png)
+
+10. Great, now you are ready to publish your API. Back to the OpenShift Console, open the **Pods** page (Workloads > Pods) (A), on the **tools** namespace (B), filter by the word **publish** (C).
+
+![](images/apic-10_1.png)
+
+11. Open the **apic-publish-deployment** pod.
+
+![](images/apic-11_1.png)
+
+    Go to the **Terminal** tab.
+
+![](images/apic-11_2.png)
+
+12. In the Terminal session, run **./apic-publish-api.sh**. Accept the license. And feel free to accept or not the limited usage tracking.
+
+![](images/apic-12_1.png)
+
+13. You need to authenticate in APIC to publish the API. Let's do it! Open the URL provided in a different browser session.
+
+14. If necessary log in APIC with **Common Services User Registry**.
+
+![](images/apic-14_1.png)
+
+   Log in with your admin and password.
+
+![](images/apic-14_2.png)
+
+15. Copy the code.
+
+![](images/apic-15_1.png)
+
+   And paste to the terminal tab on OpenShift Web Console to continue the publish process.
+
+![](images/apic-15_2.png)
+
+16. Great, your API is published successfully.
+
+![](images/apic-16_1.png)
+
 
 ***
 
@@ -713,46 +765,92 @@ git push origin
 
 Great, in this part of the lab, you will check the Demo environment and assets. On the other hand, you will collect all the evidences to prove that you were able to complete the lab (check the 3 screenshots notes).
 
-1. Back to ArgoCD page, go to the main page, and check all the 35 applications are healthy.
+1. Back to ArgoCD page, go to the main page, and check all the 35 applications are synced and healthy.
 
    ``SCREENSHOT 1`` - Take a screenshot of the main ArgoCD page showing 35 applications healthy. Please include your browser adddres bar showing your cluster URL.
 
-2. Now, let's test your demo. Open the Platform Navigator page and go to the **Integration Instances** view.
+![](images/final-1_1.png)
 
-3. Here you should see all the integrations as Ready.
+2. Now, let's test your demo. Open the Platform Navigator page and go to the **Integration Instances** view (Menu > Administration > Integration instances).
+
+![](images/final-2_1.png)
+
+3. Here you should see all the integrations as Ready (`Note:` Ignore the Warning in Kafka cluster).
 
    ``SCREENSHOT 2`` - Take a screenshot of the Integration Instances page with all instances as ready. Please include your browser adddres bar showing your cluster URL.
 
-4. Then, open the **API Manager** (Run > API).
+![](images/final-3_1.png)
 
-5. Click **Develop APIs and products**. And select **JGRMQAPI**.
+4. Then, open the **API management**.
+
+![](images/final-4_1.png)
+
+   If necessary log in API Manager with *Common Services User Registry*.
+
+5. Click **Develop APIs and products**.
+
+![](images/final-5_1.png)
+
+   And select **JGRMQAPI**.
+
+![](images/final-5_2.png)
 
 6. Put your API **online**.
 
+![](images/final-6_1.png)
+
+![](images/final-6_2.png)
+
 7. Now, let's try it! Open the **Explorer** tab.
+
+![](images/final-7_1.png)
 
 8. Click on **POST /contacts**.
 
+![](images/final-8_1.png)
+
 9. Open **Try it**.
+
+![](images/final-9_1.png)
 
 10. On the Body section, click **Generate** to create a request body sample.
 
+![](images/final-10_1.png)
+
 11. Click **Send**.
+
+![](images/final-11_1.png)
 
 12. If you received 200 response, your request has been processed (success).
     *Note:* if you receive a CORS issue. Open the URL, accept the risks and try again.
 
-13. Now, let's check the **Integration Trace** page (Operate > Integration Trace).
+![](images/final-12_1.png)
 
-14. Close the *What's New* dialog and accept the license.
+13. Now, let's check the **Integration Tracing** page (Operate > Integration Tracing).
+
+![](images/final-13_1.png)
+
+14. Close the *What's New* dialog.
+
+![](images/final-14_1.png)
+
+    Accept the license.
+
+![](images/final-14_2.png)
 
 15. Open the **Traces** view.
 
+![](images/final-15_1.png)
+
 16. Select the entry that has all APIC ACE and MQ components in the services column.
+
+![](images/final-16_1.png)
 
 17. Great, here you should have the integrated trace graph with 10 nodes, including all the demo components.
 
    ``SCREENSHOT 3`` - Take a screenshot of the Integrated Tracepage showing all the demo components (10 nodes). Please include your browser adddres bar showing your cluster URL.
+
+![](images/final-17_1.png)
 
 ***
 
